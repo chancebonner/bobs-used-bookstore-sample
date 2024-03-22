@@ -80,3 +80,4 @@ jobs:
           FOD_RELEASE_ID: 18529
           FOD_UPLOADER_OPTS: "-ep 2 -pp 2 -I 0 -apf"
           FOD_UPLOADER_NOTES: 'Triggered by GitHub Actions (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})'
+          DO_Wait: YES

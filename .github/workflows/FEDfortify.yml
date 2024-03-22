@@ -78,6 +78,6 @@ jobs:
           FOD_USER: "9fa648ee-bccb-495c-9915-e1c1f9188a59" 
           FOD_SECRET: "MFs3Vk5ZaFp1UVIrbWFHMVpkQTtsUVNKM0hvSDdB0"
           FOD_RELEASE_ID: 18529
-          FOD_UPLOADER_OPTS: "-ep 2 -pp 2 -I 0 -apf"
+          FOD_UPLOADER_OPTS: "-ep 2 -pp 2 -I 3 -apf"
           FOD_UPLOADER_NOTES: 'Triggered by GitHub Actions (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})'
           DO_Wait: TRUE

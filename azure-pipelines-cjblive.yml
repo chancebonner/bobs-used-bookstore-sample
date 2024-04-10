@@ -1,0 +1,79 @@
+variables:
+- name: BuildParameters.ArtifactName
+  value: drop
+name: $(date:yyyyMMdd)$(rev:.r)
+jobs:
+- job: Job_1
+  displayName: Agent job 1
+  pool:
+    vmImage: windows-latest
+  steps:
+  - checkout: self
+    clean: true
+    fetchTags: false
+    
+  - task: NuGetToolInstaller@0
+    displayName: Use NuGet 4.x
+    inputs:
+      versionSpec: 4.x
+      checkLatest: true
+  - task: NuGetCommand@2
+    displayName: NuGet restore
+    inputs:
+      solution: Application/SampleWebApplication.sln
+  - task: VSBuild@1
+    displayName: Build solution
+    inputs:
+      solution: Application/SampleWebApplication.sln
+      vsVersion: latest
+      msbuildArgs: /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:RestorePackagesWithLockFile=true /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactstagingdirectory)\\"
+      platform: $(BuildPlatform)
+      configuration: $(BuildConfiguration)
+      clean: true
+      createLogFile: true
+      logFileVerbosity: detailed
+  - task: VSBuild@1
+    displayName: Build solution **\*.sln
+    enabled: False
+    inputs:
+      vsVersion: 17.0
+      msbuildArgs: /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:RestorePackagesWithLockFile=true /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true
+      platform: $(BuildPlatform)
+      configuration: $(BuildConfiguration)
+      clean: true
+      maximumCpuCount: true
+      restoreNugetPackages: true
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Artifact
+    condition: succeededOrFailed()
+    inputs:
+      PathtoPublish: $(build.artifactstagingdirectory)
+      ArtifactName: $(BuildParameters.ArtifactName)
+      TargetPath: '\\my\share\$(Build.DefinitionName)\$(Build.BuildNumber)'
+
+
+  - task: fortifyvsts.hpe-security-fortify-vsts.build-task-fortify-on-demand-static.FortifyOnDemandStatic@8
+    displayName: Run Fortify on Demand static assessment on MSBuild with ScanCentral
+    condition: succeededOrFailed()
+    inputs:
+      FortifyProjects: Application/SampleWebApplication
+      FodConnection: 3a697708-8010-4a32-a906-69ac76e248b2
+      ReleaseOptions: 0
+      ReleaseId: 441166
+      ApplicationName: CB ADO . Net App
+      BusinessCriticality: 1
+      ReleaseName: 1.0
+      EntitlementSelection: 1
+      EntitlementPreference: 1
+      PurchaseEntitlements: true
+      OverrideScanSettings: 2
+      InProgressScanActionType: 2
+      RemediationScanPreference: 2
+      BuildType: msbuild
+      TechnologyStackOthers: 1
+      LanguageLevelDotNet: 32
+      LanguageLevelJava: 8
+      BuildFile: Application/SampleWebApplication.sln
+      PollingInterval: 0
+      PolicyFailAction: 0
+...

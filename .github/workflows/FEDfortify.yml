@@ -61,7 +61,7 @@ jobs:
       - name: Package Code + Dependencies
         run: scancentral package $PACKAGE_OPTS -o package.zip
         env:
-          PACKAGE_OPTS: "-bt msbuild"
+          PACKAGE_OPTS: "-bt none"
 
       # Start Fortify on Demand SAST scan and wait until results complete. For more information on FoDUploader commands, see https://github.com/fod-dev/fod-uploader-java
       # TODO: Update ENV variables for your application and create the necessary GitHub Secrets.  Helpful hints:
@@ -70,14 +70,13 @@ jobs:
       - name: Download Fortify on Demand Universal CI Tool
         uses: fortify/gha-setup-fod-uploader@6e6bb8a33cb476e240929fa8ebc739ff110e7433
       - name: Perform SAST Scan
-        run: java -jar $FOD_UPLOAD_JAR -z package.zip -aurl $FOD_API_URL -purl $FOD_URL -rid "$FOD_RELEASE_ID" -tc "$FOD_TENANT" -ac "$FOD_USER" "$FOD_SECRET" $FOD_UPLOADER_OPTS -n "$FOD_UPLOADER_NOTES"
+        run: java -jar $FOD_UPLOAD_JAR -z package.zip -aurl $FOD_API_URL -purl $FOD_URL -rid "$FOD_RELEASE_ID" -ac "$FOD_USER" "$FOD_SECRET" $FOD_UPLOADER_OPTS -n "$FOD_UPLOADER_NOTES"
         env:
           FOD_URL: "https://fed.fortifygov.com/"
           FOD_API_URL: "https://api.fed.fortifygov.com/"
-          FOD_TENANT: "Azure-SSO"
+          #FOD_TENANT: "Azure-SSO"
           FOD_USER: "9fa648ee-bccb-495c-9915-e1c1f9188a59" 
           FOD_SECRET: "MFs3Vk5ZaFp1UVIrbWFHMVpkQTtsUVNKM0hvSDdB0"
           FOD_RELEASE_ID: 18529
           FOD_UPLOADER_OPTS: "-ep 2 -pp 2 -I 3 -apf"
           FOD_UPLOADER_NOTES: 'Triggered by GitHub Actions (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})'
-          DO_Wait: TRUE
